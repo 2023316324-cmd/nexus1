@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus IT Solutions | Tecnologia & Inovação</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nexus: {
+                            dark: '#0f172a', // Fundo principal
+                            card: '#1e293b', // Fundo dos cartões
+                            primary: '#3b82f6', // Azul principal
+                            accent: '#60a5fa', // Azul claro para hover
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-bg {
+            background-image: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+        /* Animation settings for smoother feel */
+        :root{
+            --anim-ease: cubic-bezier(.16,1,.3,1);
+            --anim-speed: .68s;
+            --anim-speed-slow: .92s;
+            --modal-speed: .36s;
+        }
+        /* --- Animações de entrada e scroll --- */
+          /* --> Reveal bottom-to-top (smoother, hardware-accelerated)
+              Use data-direction="left"|"right" to add a small horizontal offset */
+          .animate-on-scroll { opacity: 0; transform: translate3d(0,28px,0); transition: opacity var(--anim-speed) var(--anim-ease), transform var(--anim-speed) var(--anim-ease); will-change: transform, opacity; backface-visibility: hidden; }
+          .animate-on-scroll.in-view { opacity: 1; transform: translate3d(0,0,0); }
+
+          /* lateral offset combined with bottom-to-top reveal */
+          .animate-on-scroll[data-direction="left"] { transform: translate3d(-14px,28px,0); }
+          .animate-on-scroll[data-direction="right"] { transform: translate3d(14px,28px,0); }
+          .animate-on-scroll.in-view[data-direction="left"], .animate-on-scroll.in-view[data-direction="right"] { transform: translate3d(0,0,0); }
+
+        /* Accessibility: respect prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            .animate-on-scroll, .animate-on-load { transition: none !important; opacity: 1 !important; transform: none !important; }
+        }
+
+        .animate-on-load { opacity: 0; transform: translate3d(0,12px,0) scale(.997); transition: opacity var(--anim-speed-slow) var(--anim-ease), transform var(--anim-speed-slow) var(--anim-ease); will-change: transform, opacity; }
+        .animate-on-load.visible { opacity: 1; transform: none; }
+
+        .member-card { transition: transform .28s var(--anim-ease), box-shadow .28s var(--anim-ease); }
+        .member-card:hover { transform: translate3d(0,-6px,0); box-shadow: 0 14px 40px rgba(0,0,0,0.42); }
+
+        /* Modal smooth transitions */
+        #member-modal { transform: translate3d(0,8px,0) scale(.98); opacity:0; transition: transform var(--modal-speed) var(--anim-ease), opacity var(--modal-speed) var(--anim-ease); }
+        #member-modal.open { transform: translate3d(0,0,0) scale(1); opacity:1; }
+
+        /* Contact form validation / toast styles */
+        .form-error { color: #fb7185; font-size: .9rem; margin-top: .375rem; display: none; }
+        .has-error .form-error { display: block; }
+
+        .toast-container { position: fixed; top: 1rem; right: 1rem; z-index: 60; display:flex; flex-direction:column; gap:.5rem; }
+        .toast { background: linear-gradient(180deg,#16a34a,#059669); color: white; padding: .75rem 1rem; border-radius: .5rem; box-shadow: 0 6px 24px rgba(0,0,0,.4); display:flex; gap:.75rem; align-items:center; }
+        .toast button { background: rgba(255,255,255,0.12); border: none; color: white; padding: .4rem .6rem; border-radius: .375rem; cursor: pointer; }
+    </style>
+</head>
+<body class="bg-nexus-dark text-gray-100 antialiased selection:bg-nexus-primary selection:text-white">
+
+    <nav class="fixed w-full z-50 bg-nexus-dark/95 backdrop-blur border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer">
+                    <!-- Substitua 'logo.png' pelo arquivo da sua logo -->
+                    <a href="/" class="flex items-center gap-3">
+                        <!-- Responsivo: h-8 em mobile, h-10 em sm, h-12 em md+ -->
+                        <img src="n.png" alt="Logo da empresa" class="h-8 sm:h-10 md:h-12 w-auto object-contain" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');" />
+                        <!-- Texto de marca visível (branco) - altere se preferir outro comportamento responsivo -->
+                        <span class="font-bold text-xl tracking-wide text-white">NEXUS <span class="text-nexus-primary">IT</span></span>
+                        <!-- Texto adicional apenas para leitores de tela -->
+                        <span class="sr-only">Nexus IT Solutions</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex space-x-8">
+                    <a href="#home" class="hover:text-nexus-primary transition-colors text-sm font-medium">Home</a>
+                    <a href="#sobre" class="hover:text-nexus-primary transition-colors text-sm font-medium">Sobre</a>
+                    <a href="#servicos" class="hover:text-nexus-primary transition-colors text-sm font-medium">Serviços</a>
+                    <a href="#contato" class="hover:text-nexus-primary transition-colors text-sm font-medium">Contato</a>
+                </div>
+
+                <div class="hidden md:block">
+                    <a href="#contato" class="bg-nexus-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-blue-500/20">
+                        Fale com Especialista
+                    </a>
+                </div>
+
+                <div class="md:hidden">
+                    <button class="text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero-bg h-screen flex items-center justify-center pt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-nexus-primary uppercase bg-blue-900/30 rounded-full border border-blue-800 animate-on-load" data-delay="0">
+                Inovação Corporativa
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-on-load" data-delay="120">
+                Conectando o Futuro <br>ao seu <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-nexus-primary">Negócio</span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 animate-on-load" data-delay="220">
+                Soluções de TI avançadas, cibersegurança e infraestrutura em nuvem para empresas que não podem parar.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#servicos" class="bg-nexus-primary hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-lg shadow-blue-500/30 animate-on-load" data-delay="320">
+                    Conhecer Soluções
+                </a>
+                <a href="#sobre" class="bg-gray-800 hover:bg-gray-700 text-white border border-gray-700 px-8 py-4 rounded-lg text-lg font-semibold transition-all animate-on-load" data-delay="420">
+                    Sobre a Nexus
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="sobre" class="py-20 bg-nexus-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="relative animate-on-scroll" data-delay="0">
+                    <div class="absolute -inset-4 bg-nexus-primary/20 rounded-xl blur-lg"></div>
+
+                    <!-- Grid de integrantes: substitua 'memberX.jpg' pelos arquivos reais -->
+                    <div class="relative grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="member-card bg-nexus-card p-6 rounded-xl border border-gray-800 text-center animate-on-scroll cursor-pointer" data-delay="0" data-direction="left" role="button" tabindex="0" data-name="Iago Ariel" data-role="Cargo / Especialidade • Técnico em Informática" data-description="Arquiteto de soluções – infraestrutura resiliente, cloud e segurança." data-bio="Iago é arquiteto de soluções com sólida experiência em infraestrutura e cloud, focado em segurança e alta disponibilidade." data-education="Técnico em Informática - IFRS Ibirubá; Certificação AWS Solutions Architect" data-photo="iago.jpeg">
+                            <img src="iago.jpeg" alt="Integrante 1" class="h-28 w-28 object-cover rounded-full mx-auto mb-4" onerror="this.src='https://via.placeholder.com/150?text=Foto'" />
+                            <h4 class="font-bold">Iago Ariel</h4>
+                            <p class="text-sm text-gray-400">Cargo / Especialidade • Técnico em Informática</p>
+                            <p class="text-xs text-gray-300 mt-2">Arquiteto de soluções – infraestrutura resiliente, cloud e segurança.</p>
+                        </div>
+
+                        <div class="member-card bg-nexus-card p-6 rounded-xl border border-gray-800 text-center animate-on-scroll cursor-pointer" data-delay="100" data-direction="right" role="button" tabindex="0" data-name="Daniel" data-role="Especialista em cibersegurança • Técnico em Informática" data-description="Especialista em cibersegurança – proteção de dados e resposta a incidentes." data-bio="Daniel é especialista em cibersegurança, com foco na proteção de dados, gestão de riscos e resposta a incidentes. Ao longo de sua carreira, conduziu avaliações de vulnerabilidades, implantação de controles de segurança e programas de resposta a incidentes, bem como treinamentos de conscientização para equipes técnicas e de negócios." data-education="Técnico em Informática - IFRS Ibirubá; Certificação CISSP" data-photo="danielc.jpg">
+                            <img src="danielc.jpg" alt="Daniel" class="h-28 w-28 object-cover rounded-full mx-auto mb-4" onerror="this.src='https://via.placeholder.com/150?text=Foto'" />
+                            <h4 class="font-bold">Daniel</h4>
+                            <p class="text-sm text-gray-400">Especialista em cibersegurança • Técnico em Informática</p>
+                            <p class="text-xs text-gray-300 mt-2">Especialista em cibersegurança – proteção de dados, detecção e resposta a incidentes.</p>
+                        </div>
+
+                        <div class="member-card bg-nexus-card p-6 rounded-xl border border-gray-800 text-center animate-on-scroll cursor-pointer" data-delay="200" data-direction="left" role="button" tabindex="0" data-name="Felipe" data-role="Cargo / Especialidade • Técnico em Informática" data-description="Engenheiro DevOps – automação, CI/CD e infra como código." data-bio="Felipe tem amplo conhecimento em automação, pipelines e infraestrutura como código, otimizando entregas e estabilidade." data-education="Técnico em Informática - IFRS Ibirubá; Certificação DevOps" data-photo="felipe.jpg">
+                            <img src="felipe.jpg" alt="Integrante 3" class="h-28 w-28 object-cover rounded-full mx-auto mb-4" onerror="this.src='https://via.placeholder.com/150?text=Foto'" />
+                            <h4 class="font-bold">Felipe</h4>
+                            <p class="text-sm text-gray-400">Cargo / Especialidade • Técnico em Informática</p>
+                            <p class="text-xs text-gray-300 mt-2">Engenheiro DevOps – automação de pipelines e infraestrutura como código.</p>
+                        </div>
+
+                        <div class="member-card bg-nexus-card p-6 rounded-xl border border-gray-800 text-center animate-on-scroll cursor-pointer" data-delay="300" data-direction="right" role="button" tabindex="0" data-name="Gustavo" data-role="Cargo / Especialidade • Técnico em Informática" data-description="Suporte e operações – atendimento, SLA e suporte gerenciado." data-bio="Gustavo é especialista em operações e atendimento, garantindo SLAs e experiência do cliente." data-education="Técnico em Informática - IFRS Ibirubá; Certificação ITIL" data-photo="gustavo.jpeg">
+                            <img src="gustavo.jpeg" alt="Integrante 4" class="h-28 w-28 object-cover rounded-full mx-auto mb-4" onerror="this.src='https://via.placeholder.com/150?text=Foto'" />
+                            <h4 class="font-bold">Gustavo</h4>
+                            <p class="text-sm text-gray-400">Cargo / Especialidade • Técnico em Informática</p>
+                            <p class="text-xs text-gray-300 mt-2">Suporte e operações – atendimento, SLA e suporte gerenciado.</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-nexus-primary font-bold tracking-wide uppercase text-sm mb-2">Quem Somos</h2>
+                    <h3 class="text-3xl md:text-4xl font-bold mb-6">Parceiros estratégicos na sua jornada digital</h3>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        Na Nexus IT Solutions, não apenas consertamos computadores; nós arquitetamos ecossistemas digitais. Com mais de 10 anos de mercado, ajudamos corporações a migrar para a nuvem, proteger seus dados e otimizar processos.
+                    </p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-nexus-primary"></i>
+                            <span>Suporte técnico 24/7 humanizado</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-nexus-primary"></i>
+                            <span>Certificações Internacionais de Segurança</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i class="fa-solid fa-check-circle text-nexus-primary"></i>
+                            <span>Redução de custos operacionais em até 30%</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="servicos" class="py-20 bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Nossas Soluções</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto">Tecnologia de ponta a ponta para cobrir todas as necessidades da sua infraestrutura.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="0">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-shield-halved text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Cibersegurança</h4>
+                    <p class="text-gray-400 text-sm mb-4">Proteção avançada contra ransomware, phishing e gestão de vulnerabilidades.</p>
+                    <a href="#" class="text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></a>
+                </div>
+
+                    <div class="bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="100">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-cloud text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Cloud Solutions</h4>
+                    <p class="text-gray-400 text-sm mb-4">Migração segura para AWS/Azure e gestão de infraestrutura híbrida.</p>
+                    <a href="#" class="text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></a>
+                </div>
+
+                    <div class="bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="200">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-laptop-code text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Consultoria TI</h4>
+                    <p class="text-gray-400 text-sm mb-4">Alinhamento estratégico de tecnologia com os objetivos do seu negócio.</p>
+                    <a href="#" class="text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></a>
+                </div>
+
+                    <div class="bg-nexus-card p-8 rounded-xl border border-gray-800 hover:border-nexus-primary transition-all hover:-translate-y-2 group animate-on-scroll" data-delay="300">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-nexus-primary transition-colors">
+                        <i class="fa-solid fa-headset text-nexus-primary text-2xl group-hover:text-white"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-3">Suporte Gerenciado</h4>
+                    <p class="text-gray-400 text-sm mb-4">Helpdesk proativo para manter sua equipe produtiva sem interrupções.</p>
+                    <a href="#" class="text-nexus-primary text-sm font-semibold hover:text-white flex items-center gap-1">Saiba mais <i class="fa-solid fa-arrow-right text-xs"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 border-y border-gray-800 bg-nexus-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="animate-on-scroll" data-delay="0">
+                    <div class="text-4xl font-bold text-white mb-1">+500</div>
+                    <div class="text-nexus-primary text-sm uppercase tracking-wider">Projetos</div>
+                </div>
+                <div class="animate-on-scroll" data-delay="80">
+                    <div class="text-4xl font-bold text-white mb-1">98%</div>
+                    <div class="text-nexus-primary text-sm uppercase tracking-wider">Satisfação</div>
+                </div>
+                <div class="animate-on-scroll" data-delay="160">
+                    <div class="text-4xl font-bold text-white mb-1">24/7</div>
+                    <div class="text-nexus-primary text-sm uppercase tracking-wider">Monitoramento</div>
+                </div>
+                <div class="animate-on-scroll" data-delay="240">
+                    <div class="text-4xl font-bold text-white mb-1">10+</div>
+                    <div class="text-nexus-primary text-sm uppercase tracking-wider">Anos Exp.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contato" class="py-20 bg-nexus-card relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-nexus-primary/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+        
+            <div class="max-w-4xl mx-auto px-4 relative z-10 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold mb-6 animate-on-scroll" data-delay="0">Pronto para modernizar sua TI?</h2>
+            <p class="text-gray-400 mb-10 text-lg animate-on-scroll" data-delay="80">Agende uma consultoria gratuita de 30 minutos com nossos arquitetos de soluções.</p>
+            
+            <form id="contact-form" class="max-w-md mx-auto space-y-4 text-left bg-nexus-dark p-8 rounded-xl border border-gray-700 shadow-2xl animate-on-scroll" data-delay="160">
+                <div id="contact-email-group">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Email Corporativo</label>
+                    <input id="contact-email" type="email" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-nexus-primary transition-colors" placeholder="seu@email.com">
+                    <p id="error-email" class="form-error">Por favor, insira um email válido.</p>
+                </div>
+                <div id="contact-subject-group">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Assunto</label>
+                    <input id="contact-subject" type="text" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-nexus-primary transition-colors" placeholder="Assunto da sua mensagem">
+                    <p id="error-subject" class="form-error">O assunto não pode ficar vazio.</p>
+                </div>
+                <!-- Hidden field to store the selected specialist from the team modal for backend/analytics -->
+                <input type="hidden" id="contact-specialist" name="contact-specialist" value="">
+                <div id="contact-message-group">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Mensagem</label>
+                    <textarea id="contact-message" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-nexus-primary transition-colors" placeholder="Conte-nos como podemos ajudar..."></textarea>
+                    <p id="error-message" class="form-error">A mensagem deve ter pelo menos 20 caracteres.</p>
+                </div>
+                <button id="contact-submit" type="button" class="w-full bg-nexus-primary hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-blue-500/20">
+                    Solicitar Contato
+                </button>
+                <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+                <p class="text-xs text-center text-gray-500 mt-4">Não enviamos spam. Seus dados estão seguros.</p>
+            </form>
+        </div>
+    </section>
+
+    <footer class="bg-nexus-dark pt-16 pb-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                <div class="col-span-1 md:col-span-1 animate-on-scroll" data-delay="0">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="fa-solid fa-network-wired text-nexus-primary text-xl"></i>
+                        <span class="font-bold text-lg">NEXUS IT</span>
+                    </div>
+                    <p class="text-gray-500 text-sm">Transformando complexidade em eficiência através da tecnologia.</p>
+                </div>
+                
+                <div class="animate-on-scroll" data-delay="80">
+                    <h4 class="text-white font-bold mb-4">Empresa</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Sobre Nós</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Carreiras</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Parceiros</a></li>
+                    </ul>
+                </div>
+
+                <div class="animate-on-scroll" data-delay="160">
+                    <h4 class="text-white font-bold mb-4">Soluções</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Cloud Computing</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Cybersecurity</a></li>
+                        <li><a href="#" class="hover:text-nexus-primary transition-colors">Consultoria</a></li>
+                    </ul>
+                </div>
+
+                <div class="animate-on-scroll" data-delay="240">
+                    <h4 class="text-white font-bold mb-4">Contato</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><i class="fa-solid fa-envelope mr-2"></i> contato@nexusit.com</li>
+                        <li><i class="fa-solid fa-phone mr-2"></i> (11) 99999-9999</li>
+                        <li><i class="fa-solid fa-location-dot mr-2"></i> São Paulo, SP</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-600 text-sm">© 2024 Nexus IT Solutions. Todos os direitos reservados.</p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><i class="fa-brands fa-linkedin text-xl"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><i class="fa-brands fa-instagram text-xl"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><i class="fa-brands fa-twitter text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script: ativa animações de entrada (load) e de rolagem (IntersectionObserver) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Entrance animations (staggered by data-delay)
+            document.querySelectorAll('.animate-on-load').forEach(function (el) {
+                var delay = el.dataset.delay ? parseInt(el.dataset.delay, 10) : 0;
+                el.style.transitionDelay = (delay / 1000) + 's';
+                setTimeout(function () { el.classList.add('visible'); }, 20 + delay);
+            });
+
+            // Scroll animations
+            // Respect user's reduced motion preference
+            var prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) {
+                document.querySelectorAll('.animate-on-scroll').forEach(function (el) { el.classList.add('in-view'); });
+            } else {
+                var io = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        var el = entry.target;
+                        var delay = el.dataset.delay ? parseInt(el.dataset.delay, 10) : 0;
+                        el.style.transitionDelay = (delay / 1000) + 's';
+                        if (entry.isIntersecting) {
+                            el.classList.add('in-view');
+                        } else {
+                            // Toggle off when scrolled out so reveal happens on re-entry
+                            el.classList.remove('in-view');
+                        }
+                    });
+                }, { root: null, rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+
+                document.querySelectorAll('.animate-on-scroll').forEach(function (el) { io.observe(el); });
+            }
+
+            // Modal de integrante: abrir/fechar e popular conteúdo
+            var modalOverlay = document.createElement('div');
+            modalOverlay.id = 'member-modal-overlay';
+            modalOverlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm hidden flex items-center justify-center z-50';
+            modalOverlay.innerHTML = `
+                <div id="member-modal" class="bg-nexus-dark text-gray-100 max-w-4xl w-full mx-4 rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 scale-95 opacity-0" role="dialog" aria-modal="true" aria-labelledby="member-modal-title">
+                    <div class="flex justify-end p-4">
+                        <button id="member-modal-close" class="text-gray-300 hover:text-white text-2xl" aria-label="Fechar">&times;</button>
+                    </div>
+                    <div class="px-6 pb-8 pt-0 md:grid md:grid-cols-3 md:gap-8 items-start">
+                        <div class="md:col-span-1 mb-6 md:mb-0 flex flex-col items-center gap-4">
+                            <img id="member-modal-photo" src="" alt="Foto do integrante" class="h-40 w-40 object-cover rounded-full border border-gray-700 shadow-lg" />
+                            <button id="member-modal-schedule" class="w-full bg-nexus-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow">Agendar conversa</button>
+                        </div>
+                        <div class="md:col-span-2">
+                            <div class="flex items-center gap-3 mb-3">
+                                <h3 id="member-modal-title" class="text-2xl font-bold mb-1">Nome</h3>
+                            </div>
+                            <div id="member-modal-role" class="text-nexus-primary font-medium mb-4">Cargo</div>
+                            <div id="member-modal-desc" class="text-sm text-gray-400 mb-4">Descrição</div>
+                            <p id="member-modal-bio" class="text-gray-300 mb-4">Biografia do integrante...</p>
+                            <div id="member-modal-education" class="text-sm text-gray-400 mb-6">Formação e certificações.</div>
+                        </div>
+                    </div>
+                </div>`;
+
+            document.body.appendChild(modalOverlay);
+
+            var modal = document.getElementById('member-modal');
+            var modalClose = document.getElementById('member-modal-close');
+
+            var lastScheduledMemberName = '';
+
+            function openMemberModal(card) {
+                var name = (card.dataset.name || '').trim();
+                var role = (card.dataset.role || '').trim();
+                var bio = (card.dataset.bio || '').trim();
+                var education = (card.dataset.education || '').trim();
+                var photo = card.dataset.photo || '';
+                // fallback to the small image inside the card if data-photo isn't set or points to a missing file
+                if (!photo) {
+                    var cardImg = card.querySelector('img');
+                    if (cardImg && cardImg.src) photo = cardImg.src;
+                }
+
+                document.getElementById('member-modal-title').textContent = name;
+                document.getElementById('member-modal-role').textContent = role;
+                document.getElementById('member-modal-bio').textContent = bio;
+                document.getElementById('member-modal-education').textContent = education;
+                var img = document.getElementById('member-modal-photo');
+                img.src = photo || 'https://via.placeholder.com/300?text=Foto';
+                img.alt = name ? ('Foto de ' + name) : 'Foto do integrante';
+                // set the modal description from the card
+                var descEl = document.getElementById('member-modal-desc');
+                var description = (card.dataset.description || '').trim();
+                if (descEl) descEl.textContent = description || '';
+
+                // Update the schedule button text for clarity: "Agendar conversa com [Nome]"
+                var scheduleBtn = document.getElementById('member-modal-schedule');
+                if (scheduleBtn) {
+                    scheduleBtn.textContent = 'Agendar conversa' + (name ? ' com ' + name : '');
+                    // store the member name on the button for quick access
+                    scheduleBtn.dataset.memberName = name;
+                    scheduleBtn.setAttribute('aria-label', 'Agendar conversa com ' + (name || 'nosso especialista'));
+                }
+
+                // remember last focused element to restore focus on close
+                modalOverlay._lastFocused = card;
+                modalOverlay.classList.remove('hidden');
+                // animate in (use CSS class)
+                setTimeout(function () { modalOverlay.querySelector('#member-modal').classList.add('open'); }, 10);
+                // disable background scroll
+                document.documentElement.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+                modalClose.focus();
+            }
+
+            function closeMemberModal() {
+                var dialog = modalOverlay.querySelector('#member-modal');
+                dialog.classList.remove('open');
+                setTimeout(function () {
+                    modalOverlay.classList.add('hidden');
+                    document.documentElement.style.overflow = '';
+                    document.body.style.overflow = '';
+                    // restore focus to the previously focused card
+                    if (modalOverlay._lastFocused && typeof modalOverlay._lastFocused.focus === 'function') {
+                        modalOverlay._lastFocused.focus();
+                        modalOverlay._lastFocused = null;
+                    }
+                }, 240);
+            }
+
+            // attach click/keyboard handlers to cards
+            document.querySelectorAll('.member-card').forEach(function (card) {
+                card.addEventListener('click', function () { openMemberModal(card); });
+                card.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMemberModal(card); } });
+            });
+
+            // close handlers
+            modalOverlay.addEventListener('click', function (e) { if (e.target === modalOverlay) closeMemberModal(); });
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMemberModal(); });
+            document.addEventListener('click', function (e) { if (e.target && e.target.id === 'member-modal-close') closeMemberModal(); });
+
+            // Schedule button: close modal and scroll to contact form, focus email
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.id === 'member-modal-schedule') {
+                    var name = document.getElementById('member-modal-title').textContent || '';
+                    // store last scheduled name so toast and submission reflect it even if the subject changes
+                    lastScheduledMemberName = name;
+                    closeMemberModal();
+                    setTimeout(function () {
+                        var contato = document.getElementById('contato');
+                        if (contato) contato.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        var emailInput = document.querySelector('#contact-email');
+                        if (emailInput) {
+                            emailInput.focus();
+                            // set a helpful placeholder mentioning the member
+                            emailInput.placeholder = 'Seu email — solicitando conversa com ' + (name || 'nosso especialista');
+                        }
+                        // prefill subject + message
+                        var subject = document.getElementById('contact-subject');
+                        var message = document.getElementById('contact-message');
+                        if (subject) subject.value = 'Agendar conversa com ' + (name || 'um especialista');
+                        if (message) message.value = 'Olá, gostaria de agendar uma conversa com ' + (name || 'um especialista') + '. Por favor, informe sua disponibilidade e melhor horário.';
+                        // Set hidden form field for backend usage
+                        var specialistField = document.getElementById('contact-specialist');
+                        if (specialistField) specialistField.value = name || '';
+                    }, 320);
+                }
+            });
+
+            // Contact form validation + submit (client-side simulated)
+            function validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            }
+
+            function showToast(name, subject, body) {
+                var container = document.getElementById('toast-container');
+                var toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = `<div class="flex-1">Solicitação pronta para: <strong>${name || 'nosso especialista'}</strong></div><div class="flex gap-2"><button id="toast-send">Abrir email</button><button id="toast-close">Fechar</button></div>`;
+                container.appendChild(toast);
+                // handlers
+                toast.querySelector('#toast-send').addEventListener('click', function () {
+                    var mailto = 'mailto:contato@nexusit.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+                    window.location.href = mailto;
+                });
+                toast.querySelector('#toast-close').addEventListener('click', function () { toast.remove(); });
+                setTimeout(function () { if (toast.parentNode) toast.remove(); }, 8000);
+            }
+
+            document.getElementById('contact-submit').addEventListener('click', function () {
+                var email = document.getElementById('contact-email').value.trim();
+                var subject = document.getElementById('contact-subject').value.trim();
+                var message = document.getElementById('contact-message').value.trim();
+
+                var valid = true;
+                // reset error states
+                document.getElementById('contact-email-group').classList.remove('has-error');
+                document.getElementById('contact-subject-group').classList.remove('has-error');
+                document.getElementById('contact-message-group').classList.remove('has-error');
+
+                if (!validateEmail(email)) { document.getElementById('contact-email-group').classList.add('has-error'); document.getElementById('error-email').textContent = 'Por favor, insira um email válido.'; valid = false; }
+                if (!subject || subject.length < 3) { document.getElementById('contact-subject-group').classList.add('has-error'); document.getElementById('error-subject').textContent = 'O assunto deve ter ao menos 3 caracteres.'; valid = false; }
+                if (!message || message.length < 20) { document.getElementById('contact-message-group').classList.add('has-error'); document.getElementById('error-message').textContent = 'A mensagem deve ter pelo menos 20 caracteres.'; valid = false; }
+
+                if (!valid) {
+                    // focus first error
+                    if (document.getElementById('contact-email-group').classList.contains('has-error')) { document.getElementById('contact-email').focus(); }
+                    else if (document.getElementById('contact-subject-group').classList.contains('has-error')) { document.getElementById('contact-subject').focus(); }
+                    else document.getElementById('contact-message').focus();
+                    return;
+                }
+
+                // Simulate successful submission and offer to open mail client
+                // Prefer the explicit stored name from the schedule action, otherwise try to infer from subject
+                var specialistField = document.getElementById('contact-specialist');
+                var specialistFromField = (specialistField && specialistField.value) ? specialistField.value.trim() : '';
+                // prefer hidden field if present, then lastScheduledMemberName, then try infer from subject
+                var displayName = specialistFromField || lastScheduledMemberName || subject.replace(/^Agendar conversa com /, '') || 'um especialista';
+                var bodyWithRef = message + '\n\nContato: ' + email + '\n\nReferente a: ' + displayName;
+                showToast(displayName, subject, bodyWithRef);
+                // Clear form optionally
+                // document.getElementById('contact-form').reset();
+            });
+        });
+    </script>
+
+</body>
+</html>
