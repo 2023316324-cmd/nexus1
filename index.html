@@ -108,6 +108,23 @@
         .viewer-img-wrap:active { cursor: grabbing; }
         #member-photo-viewer-close { position:absolute; right: 0.5rem; top: 0.5rem; font-size: 1.5rem; background: transparent; border: none; color: white; cursor: pointer; }
         #member-photo-viewer-signature { position:absolute; left:1rem; bottom:3.6rem; width:220px; filter: drop-shadow(0 8px 22px rgba(0,0,0,.6)); }
+        
+        /* Texto piscando no viewer */
+        .viewer-hint-text { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,0.6); font-size: 0.875rem; text-align: center; animation: blink-hint 2s ease-in-out infinite; pointer-events: none; z-index: 100; }
+        @keyframes blink-hint { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+        
+        /* Ajustes mobile para foto do modal */
+        @media (max-width: 768px) {
+            .photo-panel { height: 20rem; margin: 0; }
+            #member-modal { margin: 0.5rem; max-width: calc(100% - 1rem); }
+            #member-modal .md\:grid { display: block !important; }
+            .viewer-hint-text { font-size: 0.75rem; bottom: 1rem; }
+        }
+        
+        @media (max-width: 640px) {
+            .photo-panel { height: 18rem; }
+            #member-modal-signature { width: 140px; bottom: 2rem; left: 0.75rem; }
+        }
 
         /* Modal smooth transitions */
         #member-modal { transform: translate3d(0,8px,0) scale(.98); opacity:0; transition: transform var(--modal-speed) var(--anim-ease), opacity var(--modal-speed) var(--anim-ease); }
@@ -155,9 +172,19 @@
                 </div>
 
                 <div class="md:hidden">
-                    <button class="text-gray-300 hover:text-white">
-                        <i class="fa-solid fa-bars text-2xl"></i>
+                    <button id="mobile-menu-toggle" class="text-gray-300 hover:text-white" aria-label="Abrir menu" aria-expanded="false">
+                        <i id="mobile-menu-icon" class="fa-solid fa-bars text-2xl"></i>
                     </button>
+                </div>
+            </div>
+            <!-- Menu mobile -->
+            <div id="mobile-menu" class="hidden md:hidden mt-3 pb-4 border-t border-gray-800">
+                <div class="flex flex-col gap-3 pt-3">
+                    <a href="#home" class="text-sm font-medium text-gray-200 hover:text-nexus-primary">Home</a>
+                    <a href="#sobre" class="text-sm font-medium text-gray-200 hover:text-nexus-primary">Sobre</a>
+                    <a href="#servicos" class="text-sm font-medium text-gray-200 hover:text-nexus-primary">Serviços</a>
+                    <a href="#contato" class="text-sm font-medium text-gray-200 hover:text-nexus-primary">Contato</a>
+                    <a href="#contato" class="mt-1 inline-flex items-center justify-center bg-nexus-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-blue-500/20">Fale com Especialista</a>
                 </div>
             </div>
         </div>
@@ -540,7 +567,7 @@
                     <p class="text-gray-500 text-sm">Transformando complexidade em eficiência através da tecnologia.</p>
                 </div>
                 
-                   <div class="animate-on-scroll" data-delay="80">
+                <div class="animate-on-scroll" data-delay="80">
                     <h4 class="text-white font-bold mb-4">Empresa</h4>
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li><a href="#sobre" class="hover:text-nexus-primary transition-colors">Sobre Nós</a></li>
@@ -549,7 +576,7 @@
                     </ul>
                 </div>
 
-              <div class="animate-on-scroll" data-delay="160">
+                <div class="animate-on-scroll" data-delay="160">
                     <h4 class="text-white font-bold mb-4">Soluções</h4>
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li><a href="#servicos" class="hover:text-nexus-primary transition-colors">Manutenção de Computadores</a></li>
@@ -583,6 +610,37 @@
     <!-- Script: ativa animações de entrada (load) e de rolagem (IntersectionObserver) -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Mobile menu toggle
+            var mobileToggle = document.getElementById('mobile-menu-toggle');
+            var mobileMenu = document.getElementById('mobile-menu');
+            var mobileIcon = document.getElementById('mobile-menu-icon');
+            if (mobileToggle && mobileMenu) {
+                var toggleMenu = function () {
+                    var isOpen = !mobileMenu.classList.contains('hidden');
+                    if (isOpen) {
+                        mobileMenu.classList.add('hidden');
+                        mobileToggle.setAttribute('aria-expanded', 'false');
+                        if (mobileIcon) { mobileIcon.classList.remove('fa-xmark'); mobileIcon.classList.add('fa-bars'); }
+                    } else {
+                        mobileMenu.classList.remove('hidden');
+                        mobileToggle.setAttribute('aria-expanded', 'true');
+                        if (mobileIcon) { mobileIcon.classList.remove('fa-bars'); mobileIcon.classList.add('fa-xmark'); }
+                    }
+                };
+                mobileToggle.addEventListener('click', function (e) { e.stopPropagation(); toggleMenu(); });
+                document.addEventListener('click', function (e) {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        var target = e.target;
+                        if (mobileMenu && !mobileMenu.contains(target) && !mobileToggle.contains(target)) {
+                            toggleMenu();
+                        }
+                    }
+                });
+                mobileMenu.querySelectorAll('a').forEach(function (link) {
+                    link.addEventListener('click', function () { mobileMenu.classList.add('hidden'); mobileToggle.setAttribute('aria-expanded', 'false'); if (mobileIcon) { mobileIcon.classList.remove('fa-xmark'); mobileIcon.classList.add('fa-bars'); } });
+                });
+            }
+
             // Configuração EmailJS (valores reais já inseridos acima)
             var EMAILJS_PUBLIC_KEY = "XN0ZyQZH95LNf8TOU";
             var EMAILJS_SERVICE_ID = "service_1k96fdj";
@@ -757,7 +815,7 @@
                     var viewer = document.createElement('div');
                     viewer.id = 'member-photo-viewer-overlay';
                     viewer.className = 'fixed inset-0 bg-black/90 flex items-center justify-center z-60 hidden';
-                    viewer.innerHTML = '<div class="relative max-w-6xl w-full mx-4 touch-none"><button id="member-photo-viewer-close" aria-label="Fechar" class="absolute z-70 right-2 top-2 text-white text-2xl cursor-pointer">&times;</button><div class="viewer-frame overflow-hidden rounded-xl"><div id="viewer-img-wrap" class="viewer-img-wrap w-full h-full touch-pan-x touch-pan-y" style="touch-action:none; -ms-touch-action:none;"><img id="member-photo-viewer-img" src="" alt="Foto expandida" class="viewer-img w-full h-auto max-h-[90vh] object-contain" /></div><img id="member-photo-viewer-signature" src="" class="signature-overlay" aria-hidden="true" onerror="this.style.display=\'none\'" /></div></div>';
+                    viewer.innerHTML = '<div class="relative max-w-6xl w-full mx-4 touch-none"><button id="member-photo-viewer-close" aria-label="Fechar" class="absolute z-70 right-2 top-2 text-white text-2xl cursor-pointer">&times;</button><div class="viewer-frame overflow-hidden rounded-xl"><div id="viewer-img-wrap" class="viewer-img-wrap w-full h-full touch-pan-x touch-pan-y" style="touch-action:none; -ms-touch-action:none;"><img id="member-photo-viewer-img" src="" alt="Foto expandida" class="viewer-img w-full h-auto max-h-[90vh] object-contain" /></div><img id="member-photo-viewer-signature" src="" class="signature-overlay" aria-hidden="true" onerror="this.style.display=\'none\'" /></div><div class="viewer-hint-text">Clique na tela para sair</div></div>';
                     document.body.appendChild(viewer);
                     // attach close handler
                     viewer.addEventListener('click', function (e) { if (e.target === viewer || e.target.id === 'member-photo-viewer-close') { viewer.classList.add('hidden'); document.documentElement.style.overflow = ''; document.body.style.overflow = ''; resetViewerTransforms(); } });
@@ -1301,6 +1359,4 @@
     </script>
 
 </body>
-
 </html>
-
